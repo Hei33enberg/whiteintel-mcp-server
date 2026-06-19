@@ -1,0 +1,36 @@
+{
+  "name": "@whiteintel/mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for WhiteIntel — corporate & offshore ownership intelligence. Look up UK companies, search entities (companies + people), and trace ownership chains to the ultimate beneficial owner. Free & open, no auth.",
+  "type": "module",
+  "bin": {
+    "whiteintel-mcp-server": "index.js"
+  },
+  "files": ["index.js", "lib.js", "README.md", "LICENSE", "CHANGELOG.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test test/lib.test.js",
+    "smoke": "node test/smoke.mjs"
+  },
+  "keywords": [
+    "mcp", "model-context-protocol", "mcp-server", "whiteintel", "osint",
+    "corporate-intelligence", "beneficial-ownership", "ubo", "companies-house",
+    "due-diligence", "aml", "kyc", "ownership-graph", "ai-agents", "tool-use"
+  ],
+  "mcp": {
+    "categories": ["Search & Data Extraction", "Finance & Fintech", "Knowledge & Research"]
+  },
+  "homepage": "https://whiteintel.dev",
+  "repository": { "type": "git", "url": "https://github.com/Hei33enberg/whiteintel-mcp-server" },
+  "license": "MIT",
+  "author": "whiteintel.dev",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "~1.29.0"
+  }
+}

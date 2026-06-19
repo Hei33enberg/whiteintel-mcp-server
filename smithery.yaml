@@ -1,0 +1,16 @@
+# Smithery deployment config — https://smithery.ai
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      whiteintelApiBase:
+        type: string
+        description: "API origin (defaults to https://whiteintel.dev; SSRF-guarded)."
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['index.js'],
+      env: config.whiteintelApiBase ? { WHITEINTEL_API_BASE: config.whiteintelApiBase } : {}
+    })
