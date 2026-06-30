@@ -4,6 +4,9 @@ startCommand:
   configSchema:
     type: object
     properties:
+      whiteintelApiKey:
+        type: string
+        description: "Optional wi_ API key (whiteintel.dev → Settings → API keys). Forwarded as a Bearer token to authenticate as your plan and lift free-tier limits. Omit to use the anonymous free tier."
       whiteintelApiBase:
         type: string
         description: "API origin (defaults to https://whiteintel.dev; SSRF-guarded)."
@@ -12,5 +15,8 @@ startCommand:
     (config) => ({
       command: 'node',
       args: ['index.js'],
-      env: config.whiteintelApiBase ? { WHITEINTEL_API_BASE: config.whiteintelApiBase } : {}
+      env: {
+        ...(config.whiteintelApiKey ? { WHITEINTEL_API_KEY: config.whiteintelApiKey } : {}),
+        ...(config.whiteintelApiBase ? { WHITEINTEL_API_BASE: config.whiteintelApiBase } : {})
+      }
     })

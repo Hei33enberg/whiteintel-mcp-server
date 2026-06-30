@@ -11,8 +11,12 @@
  * fully-worked demo investigations. The offshore corpus (ICIJ Offshore Leaks
  * et al.) is on the roadmap and is clearly flagged when absent.
  *
- * Free & open, no auth. Stdio transport. Add to an MCP client (Claude Desktop,
- * Cursor) with:  { "command": "npx", "args": ["-y", "@whiteintel/mcp-server"] }
+ * Freemium. Without a key, calls hit the anonymous free tier. Set WHITEINTEL_API_KEY
+ * (a wi_… key from whiteintel.dev → Settings → API keys) to authenticate as your
+ * plan and lift free-tier limits — it's forwarded as a Bearer token. Stdio transport.
+ * Add to an MCP client (Claude Desktop, Cursor) with:
+ *   { "command": "npx", "args": ["-y", "@whiteintel/mcp-server"],
+ *     "env": { "WHITEINTEL_API_KEY": "wi_…" } }   // env optional (free tier without it)
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -25,14 +29,19 @@ import { resolveBase, qs } from "./lib.js";
 
 const REQUEST_TIMEOUT_MS = Number(process.env.WHITEINTEL_TIMEOUT_MS) || 30_000;
 const API_BASE = resolveBase(process.env.WHITEINTEL_API_BASE);
+// Optional wi_ API key — when present, forwarded as a Bearer token so the caller is
+// authenticated as their plan and metered per-key (instead of the anonymous tier).
+const API_KEY = (process.env.WHITEINTEL_API_KEY || "").trim();
 
 async function apiGet(path) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const headers = { accept: "application/json", "user-agent": "whiteintel-mcp-server" };
+  if (API_KEY) headers.authorization = `Bearer ${API_KEY}`;
   let res;
   try {
     res = await fetch(`${API_BASE}${path}`, {
-      headers: { accept: "application/json", "user-agent": "whiteintel-mcp-server" },
+      headers,
       signal: ctrl.signal,
     });
   } catch (e) {
@@ -191,7 +200,7 @@ const TOOLS = [
 const TOOL_BY_NAME = Object.fromEntries(TOOLS.map((t) => [t.name, t]));
 
 const server = new Server(
-  { name: "whiteintel-mcp-server", version: "0.2.0" },
+  { name: "whiteintel-mcp-server", version: "0.3.1" },
   { capabilities: { tools: {} } },
 );
 
@@ -216,7 +225,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // stderr is safe for logs (stdout is the MCP transport).
-  console.error(`whiteintel-mcp-server running on stdio · ${TOOLS.length} tools · API ${API_BASE}`);
+  console.error(`whiteintel-mcp-server running on stdio · ${TOOLS.length} tools · API ${API_BASE} · ${API_KEY ? "keyed" : "anonymous (free tier)"}`);
 }
 
 main().catch((err) => {

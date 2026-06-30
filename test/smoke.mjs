@@ -1,4 +1,4 @@
-// Black-box smoke: spawn the server, send initialize + tools/list, assert >=5 tools.
+// Black-box smoke: spawn the server, send initialize + tools/list, assert >=9 tools.
 // Network-free (only the MCP stdio handshake — no live API call).
 import { spawn } from "node:child_process";
 
@@ -16,7 +16,7 @@ p.stdout.on("data", (d) => {
     } catch {
       continue;
     }
-    if (msg.id === 2 && Array.isArray(msg.result?.tools) && msg.result.tools.length >= 5) {
+    if (msg.id === 2 && Array.isArray(msg.result?.tools) && msg.result.tools.length >= 9) {
       console.log(`OK: tools/list returned ${msg.result.tools.length} tools (${msg.result.tools.map((t) => t.name).join(", ")})`);
       done = true;
       p.kill();
